@@ -14,5 +14,6 @@ public interface InterfaceA : InterfaceParent
         Console.WriteLine("Hi");
     }
     
-    
+    string Name { get; set; }
+
 }
