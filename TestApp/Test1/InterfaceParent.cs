@@ -1,6 +1,6 @@
-﻿namespace TestApp;
+﻿namespace TestApp.Test1;
 
-public class InterfaceParent
+public interface InterfaceParent
 {
     
 }
