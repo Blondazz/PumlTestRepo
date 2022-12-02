@@ -17,5 +17,6 @@ public interface InterfaceA : InterfaceParent
     string Name { get; set; }
     
     static string Property { get; set; }
+    static bool Test {private get; init;}
     event EventHandler statusChanged;
 }
