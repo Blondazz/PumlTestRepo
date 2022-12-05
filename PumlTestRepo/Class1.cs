@@ -16,6 +16,9 @@ public class C1
     protected internal int IntInternalProtected = 55;
     protected internal int IntInternalProtectedWithoutValue;
 
+    public static string StringProp { protected get; set; } =
+        "WITAM SERDECZNIE TUTAJ JAKUB GAŹDZIK <<internal>> {static}";
+
 
     public Tuple<int, string, LoaderOptimization> TupleFun()
     {
@@ -42,7 +45,7 @@ public class C1
     private int IntProp { get; set; }
     public int IntPropPublic { get; set; } = 60;
 
-    public int IntPropPublicWithProtected { protected get;  set; }
+    public int IntPropPublicWithProtected { protected get; set; }
 
 
     public int IntPropExt
