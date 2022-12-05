@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿using System.Collections;
+using System.Security;
 
 namespace PumlTestRepo;
 
@@ -73,6 +74,7 @@ public interface C1Interface
 public abstract class AbstractClass
 {
     public abstract void AVoid();
+    internal abstract DictionaryBase DictionaryAbstractInternal();
     public abstract int X { get; set; }
     public abstract DateOnly DDD(DateTime someName);
 }
