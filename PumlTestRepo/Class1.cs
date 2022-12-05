@@ -42,6 +42,9 @@ public class C1
     private int IntProp { get; set; }
     public int IntPropPublic { get; set; } = 60;
 
+    public int IntPropPublicWithProtected { protected get;  set; }
+
+
     public int IntPropExt
     {
         get { return IntProtected; }
@@ -120,7 +123,7 @@ public class C5<T1, T2>
     {
         return null;
     }
-    
+
     public Dictionary<T1, T2> Dict2(Dictionary<T1, T2> ddd)
     {
         return null;
