@@ -61,3 +61,10 @@ internal class C3
 public static class C4
 {
 }
+
+public class C5<T1, T2>
+{
+    public T1 T1Field;
+    
+    
+}
