@@ -16,6 +16,8 @@ public class C1
     protected internal int IntInternalProtected = 55;
     protected internal int IntInternalProtectedWithoutValue;
 
+    
+    
     internal void VoidInternal()
     {
     }
@@ -30,6 +32,21 @@ public class C1
 
     private int IntProp { get; set; }
     public int IntPropPublic { get; set; } = 60;
+
+    public int IntPropExt
+    {
+        get
+        {
+            return IntProtected;
+        }
+        set
+        {
+            intPrivate = value;
+        }
+    }
+    
+    
+    
 
     public int IntPropCombined1 { private get; init; }
 
