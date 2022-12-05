@@ -16,8 +16,17 @@ public class C1
     protected internal int IntInternalProtected = 55;
     protected internal int IntInternalProtectedWithoutValue;
 
-    
-    
+
+    public Tuple<int, string, LoaderOptimization> TupleFun()
+    {
+        return null;
+    }
+
+    public (int a, string b) TupleFun2()
+    {
+        return (0, "");
+    }
+
     internal void VoidInternal()
     {
     }
@@ -35,18 +44,10 @@ public class C1
 
     public int IntPropExt
     {
-        get
-        {
-            return IntProtected;
-        }
-        set
-        {
-            intPrivate = value;
-        }
+        get { return IntProtected; }
+        set { intPrivate = value; }
     }
-    
-    
-    
+
 
     public int IntPropCombined1 { private get; init; }
 
@@ -114,4 +115,9 @@ public static class C4
 public class C5<T1, T2>
 {
     public T1 T1Field;
+
+    public Dictionary<T1, T2> Dict()
+    {
+        return null;
+    }
 }
