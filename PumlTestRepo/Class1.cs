@@ -19,6 +19,7 @@ public class C1
     public static string StringProp { protected get; set; } =
         "WITAM SERDECZNIE TUTAJ JAKUB GAŹDZIK <<internal>> {static}";
 
+    public static string StringField = "";
 
     public Tuple<int, string, LoaderOptimization> TupleFun()
     {
