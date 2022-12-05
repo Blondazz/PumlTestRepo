@@ -120,4 +120,9 @@ public class C5<T1, T2>
     {
         return null;
     }
+    
+    public Dictionary<T1, T2> Dict2(Dictionary<T1, T2> ddd)
+    {
+        return null;
+    }
 }
