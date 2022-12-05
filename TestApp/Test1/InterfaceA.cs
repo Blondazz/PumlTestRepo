@@ -14,5 +14,9 @@ public interface InterfaceA : InterfaceParent
         Console.WriteLine("Hi");
     }
     
+    string Name { get; set; }
     
+    static string Property { get; set; }
+    static bool Test {private get; init;}
+    event EventHandler statusChanged;
 }
