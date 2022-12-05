@@ -10,6 +10,8 @@ public class C1
     public const int IntConstPublic = 20;
     private static int IntStatic;
     public static int IntStaticPublic = 40;
+    protected int IntProtected = 50;
+    internal int IntInternal = 55;
 
     private int IntProp { get; set; }
     public int IntPropPublic { get; set; } = 60;
