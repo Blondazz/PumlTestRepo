@@ -4,6 +4,14 @@ using System.Security;
 
 namespace PumlTestRepo;
 
+
+public abstract class XXXX
+{
+    public  abstract int X { get; set; }
+    public abstract void H(int a, string b, Tuple<int, float> c);
+    internal abstract int Y();
+}
+
 public class C1
 {
     private int intPrivate;
