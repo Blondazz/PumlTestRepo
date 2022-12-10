@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Data;
 using System.Security;
 
 namespace PumlTestRepo;
@@ -30,6 +31,14 @@ public class C1
     {
         return (0, "");
     }
+
+
+    public static Tuple<Int16, int> AdditionalGenericArgs(int a,
+        Tuple<int, float, IsolationLevel> tuple1, Dictionary<string, Tuple<Int16, Int32>> tuple2)
+    {
+        return new Tuple<short, int>(0, 1);
+    }
+
 
     internal void VoidInternal()
     {
