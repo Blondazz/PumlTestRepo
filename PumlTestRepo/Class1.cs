@@ -4,19 +4,36 @@ using System.Security;
 
 namespace PumlTestRepo;
 
-
 public abstract class XXXX
 {
-    public  abstract int X { get; set; }
+    public abstract int X { get; set; }
     public abstract void H(int a, string b, Tuple<int, float> c);
     internal abstract int Y();
+}
+
+public class C100
+{
+    public virtual void XD()
+    {
+        Console.Write("XD");
+    }
+    
+    public readonly int ReadOnlyInt = 217000;
+}
+
+public class C1002 : C100
+{
+    public override void XD()
+    {
+        Console.Write("XD2");
+    }
 }
 
 public class C1
 {
     public event EventHandler Somet;
     private static event EventHandler XD;
-    internal event EventHandler<string> lol; 
+    internal event EventHandler<string> lol;
     private int intPrivate;
     public int IntPublic;
     private const int IntConst = 10;
@@ -27,6 +44,8 @@ public class C1
     internal int IntInternal = 55;
     protected internal int IntInternalProtected = 55;
     protected internal int IntInternalProtectedWithoutValue;
+
+
 
     public static string StringProp { protected get; set; } =
         "WITAM SERDECZNIE TUTAJ JAKUB GAŹDZIK <<internal>> {static}";
