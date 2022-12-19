@@ -4,6 +4,37 @@ using System.Security;
 
 namespace PumlTestRepo;
 
+public class PublicClass
+{
+    private class PrivateClass
+    {
+    }
+}
+
+internal class InternalClass
+{
+}
+
+
+public struct PublicStruct
+{
+    private struct PrivateStruct
+    {
+        
+    }
+}
+
+internal struct InternalStruct
+{
+    
+}
+
+
+public class ClassWithGenerics<T1, T2>
+{
+    
+}
+
 public abstract class XXXX
 {
     public abstract int X { get; set; }
@@ -17,7 +48,8 @@ public class C100
     {
         Console.Write("XD");
     }
-    
+
+    public virtual event EventHandler Somet;
     public readonly int ReadOnlyInt = 217000;
 }
 
@@ -26,6 +58,13 @@ public class C1002 : C100
     public override void XD()
     {
         Console.Write("XD2");
+    }
+
+
+    public override event EventHandler Somet;
+
+    public void xDDD()
+    {
     }
 }
 
@@ -44,7 +83,6 @@ public class C1
     internal int IntInternal = 55;
     protected internal int IntInternalProtected = 55;
     protected internal int IntInternalProtectedWithoutValue;
-
 
 
     public static string StringProp { protected get; set; } =
