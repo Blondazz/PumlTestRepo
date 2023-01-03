@@ -15,24 +15,47 @@ internal class InternalClass
 {
 }
 
-
 public struct PublicStruct
 {
     private struct PrivateStruct
     {
-        
     }
 }
 
 internal struct InternalStruct
 {
-    
 }
-
 
 public class ClassWithGenerics<T1, T2>
 {
-    
+}
+
+public enum EnumPublic
+{
+    A = 10,
+    B = 135,
+    C = 2137
+}
+
+internal enum EnumInternal
+{
+    a,
+    b,
+    c,
+}
+
+public enum EnumPublicTyped : byte
+{
+    X,
+    Y,
+    Z = 123
+}
+
+internal enum EnumInternalTyped : ushort
+{
+    x,
+    y,
+    z = 99
 }
 
 public abstract class XXXX
