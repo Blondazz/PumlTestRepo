@@ -44,11 +44,11 @@ internal enum EnumInternal
     c,
 }
 
-public enum EnumPublicTyped : byte
+public enum EnumPublicTyped : long
 {
     X,
     Y,
-    Z = 123
+    Z = -123
 }
 
 internal enum EnumInternalTyped : ushort
