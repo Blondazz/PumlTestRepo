@@ -93,6 +93,17 @@ public class C1002 : C100
 
 public class C1
 {
+
+    private C1 instance;
+
+    public C1 GetInstance()
+    {
+        return instance;
+    }
+    
+    
+    
+    
     public event EventHandler Somet;
     private static event EventHandler XD;
     internal event EventHandler<string> lol;
