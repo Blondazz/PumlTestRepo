@@ -94,7 +94,7 @@ public class C1002 : C100
 public class C1
 {
 
-    private C1 instance;
+    public C1 instance;
 
 
     
