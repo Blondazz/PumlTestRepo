@@ -2,7 +2,7 @@
 
 public class Singleton
 {
-    private Singleton Instance;
+    private Singleton Instance { set; get; }
 
     public Singleton GetInstance()
     {
