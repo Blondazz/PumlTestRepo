@@ -6,9 +6,6 @@ public class Singleton
 
     public Singleton GetInstance()
     {
-        if (Instance == null)
-            Instance = new Singleton();
-
-        return Instance;
+        return null;
     }
 }
