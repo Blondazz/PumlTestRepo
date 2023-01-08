@@ -2,10 +2,19 @@
 
 public class Singleton
 {
-    private Singleton Instance { set; get; }
+    private static Singleton Instance { set; get; }
 
-    public Singleton GetInstance()
+    private Singleton()
     {
-        return null;
+    }
+
+    public static Singleton GetInstance()
+    {
+        if (Instance == null)
+        {
+            Instance = new Singleton();
+        }
+
+        return Instance;
     }
 }
