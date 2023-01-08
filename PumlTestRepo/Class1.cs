@@ -96,11 +96,7 @@ public class C1
 
     private C1 instance;
 
-    public C1 GetInstance()
-    {
-        return instance;
-    }
-    
+
     
     
     
