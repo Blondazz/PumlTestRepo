@@ -1,111 +1,118 @@
-﻿namespace PumlTestRepo;
+﻿using System;
 
-using System;
-
-// The Creator class declares the factory method that is supposed to return
-// an object of a Product class. The Creator's subclasses usually provide
-// the implementation of this method.
-abstract class Creator
+namespace RefactoringGuru.DesignPatterns.Composite.Conceptual
 {
-    // Note that the Creator may also provide some default implementation of
-    // the factory method.
-    public abstract IProduct FactoryMethod();
-
-    // Also note that, despite its name, the Creator's primary
-    // responsibility is not creating products. Usually, it contains some
-    // core business logic that relies on Product objects, returned by the
-    // factory method. Subclasses can indirectly change that business logic
-    // by overriding the factory method and returning a different type of
-    // product from it.
-    public string SomeOperation()
+    // The base Component interface defines operations that can be altered by
+    // decorators.
+    public abstract class Component
     {
-        // Call the factory method to create a Product object.
-        var product = FactoryMethod();
-        // Now, use the product.
-        var result = "Creator: The same creator's code has just worked with "
-                     + product.Operation();
-
-        return result;
-    }
-}
-
-// Concrete Creators override the factory method in order to change the
-// resulting product's type.
-class ConcreteCreator1 : Creator
-{
-    // Note that the signature of the method still uses the abstract product
-    // type, even though the concrete product is actually returned from the
-    // method. This way the Creator can stay independent of concrete product
-    // classes.
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct1();
-    }
-}
-
-class ConcreteCreator2 : Creator
-{
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct2();
-    }
-}
-
-// The Product interface declares the operations that all concrete products
-// must implement.
-public interface IProduct
-{
-    string Operation();
-}
-
-// Concrete Products provide various implementations of the Product
-// interface.
-class ConcreteProduct1 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct1}";
-    }
-}
-
-class ConcreteProduct2 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct2}";
-    }
-}
-
-class Client
-{
-    public void Main()
-    {
-        Console.WriteLine("App: Launched with the ConcreteCreator1.");
-        ClientCode(new ConcreteCreator1());
-
-        Console.WriteLine("");
-
-        Console.WriteLine("App: Launched with the ConcreteCreator2.");
-        ClientCode(new ConcreteCreator2());
+        public abstract string Operation();
     }
 
-    // The client code works with an instance of a concrete creator, albeit
-    // through its base interface. As long as the client keeps working with
-    // the creator via the base interface, you can pass it any creator's
-    // subclass.
-    public void ClientCode(Creator creator)
+    // Concrete Components provide default implementations of the operations.
+    // There might be several variations of these classes.
+    class ConcreteComponent : Component
     {
-        // ...
-        Console.WriteLine("Client: I'm not aware of the creator's class," +
-                          "but it still works.\n" + creator.SomeOperation());
-        // ...
+        public override string Operation()
+        {
+            return "ConcreteComponent";
+        }
     }
-}
 
-class Program
-{
-    static void Main(string[] args)
+    // The base Decorator class follows the same interface as the other
+    // components. The primary purpose of this class is to define the wrapping
+    // interface for all concrete decorators. The default implementation of the
+    // wrapping code might include a field for storing a wrapped component and
+    // the means to initialize it.
+    abstract class Decorator : Component
     {
-        new Client().Main();
+        protected Component _component;
+
+        public Decorator(Component component)
+        {
+            this._component = component;
+        }
+
+        public void SetComponent(Component component)
+        {
+            this._component = component;
+        }
+
+        // The Decorator delegates all work to the wrapped component.
+        public override string Operation()
+        {
+            if (this._component != null)
+            {
+                return this._component.Operation();
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    // Concrete Decorators call the wrapped object and alter its result in some
+    // way.
+    class ConcreteDecoratorA : Decorator
+    {
+        public ConcreteDecoratorA(Component comp) : base(comp)
+        {
+        }
+
+        // Decorators may call parent implementation of the operation, instead
+        // of calling the wrapped object directly. This approach simplifies
+        // extension of decorator classes.
+        public override string Operation()
+        {
+            return $"ConcreteDecoratorA({base.Operation()})";
+        }
+    }
+
+    // Decorators can execute their behavior either before or after the call to
+    // a wrapped object.
+    class ConcreteDecoratorB : Decorator
+    {
+        public ConcreteDecoratorB(Component comp) : base(comp)
+        {
+        }
+
+        public override string Operation()
+        {
+            return $"ConcreteDecoratorB({base.Operation()})";
+        }
+    }
+    
+    public class Client
+    {
+        // The client code works with all objects using the Component interface.
+        // This way it can stay independent of the concrete classes of
+        // components it works with.
+        public void ClientCode(Component component)
+        {
+            Console.WriteLine("RESULT: " + component.Operation());
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Client client = new Client();
+
+            var simple = new ConcreteComponent();
+            Console.WriteLine("Client: I get a simple component:");
+            client.ClientCode(simple);
+            Console.WriteLine();
+
+            // ...as well as decorated ones.
+            //
+            // Note how decorators can wrap not only simple components but the
+            // other decorators as well.
+            ConcreteDecoratorA decorator1 = new ConcreteDecoratorA(simple);
+            ConcreteDecoratorB decorator2 = new ConcreteDecoratorB(decorator1);
+            Console.WriteLine("Client: Now I've got a decorated component:");
+            client.ClientCode(decorator2);
+        }
     }
 }
