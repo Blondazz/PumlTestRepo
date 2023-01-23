@@ -1,111 +1,97 @@
-﻿namespace PumlTestRepo;
+﻿using System;
 
-using System;
-
-// The Creator class declares the factory method that is supposed to return
-// an object of a Product class. The Creator's subclasses usually provide
-// the implementation of this method.
-abstract class Creator
+namespace RefactoringGuru.DesignPatterns.Proxy.Conceptual
 {
-    // Note that the Creator may also provide some default implementation of
-    // the factory method.
-    public abstract IProduct FactoryMethod();
-
-    // Also note that, despite its name, the Creator's primary
-    // responsibility is not creating products. Usually, it contains some
-    // core business logic that relies on Product objects, returned by the
-    // factory method. Subclasses can indirectly change that business logic
-    // by overriding the factory method and returning a different type of
-    // product from it.
-    public string SomeOperation()
+    // The Subject interface declares common operations for both RealSubject and
+    // the Proxy. As long as the client works with RealSubject using this
+    // interface, you'll be able to pass it a proxy instead of a real subject.
+    public interface ISubject
     {
-        // Call the factory method to create a Product object.
-        var product = FactoryMethod();
-        // Now, use the product.
-        var result = "Creator: The same creator's code has just worked with "
-                     + product.Operation();
-
-        return result;
+        void Request();
     }
-}
-
-// Concrete Creators override the factory method in order to change the
-// resulting product's type.
-class ConcreteCreator1 : Creator
-{
-    // Note that the signature of the method still uses the abstract product
-    // type, even though the concrete product is actually returned from the
-    // method. This way the Creator can stay independent of concrete product
-    // classes.
-    public override IProduct FactoryMethod()
+    
+    // The RealSubject contains some core business logic. Usually, RealSubjects
+    // are capable of doing some useful work which may also be very slow or
+    // sensitive - e.g. correcting input data. A Proxy can solve these issues
+    // without any changes to the RealSubject's code.
+    class RealSubject : ISubject
     {
-        return new ConcreteProduct1();
+        public void Request()
+        {
+            Console.WriteLine("RealSubject: Handling Request.");
+        }
     }
-}
-
-class ConcreteCreator2 : Creator
-{
-    public override IProduct FactoryMethod()
+    
+    // The Proxy has an interface identical to the RealSubject.
+    class Proxy : ISubject
     {
-        return new ConcreteProduct2();
+        private RealSubject _realSubject;
+        
+        public Proxy(RealSubject realSubject)
+        {
+            this._realSubject = realSubject;
+        }
+        
+        // The most common applications of the Proxy pattern are lazy loading,
+        // caching, controlling the access, logging, etc. A Proxy can perform
+        // one of these things and then, depending on the result, pass the
+        // execution to the same method in a linked RealSubject object.
+        public void Request()
+        {
+            if (this.CheckAccess())
+            {
+                this._realSubject.Request();
+
+                this.LogAccess();
+            }
+        }
+        
+        public bool CheckAccess()
+        {
+            // Some real checks should go here.
+            Console.WriteLine("Proxy: Checking access prior to firing a real request.");
+
+            return true;
+        }
+        
+        public void LogAccess()
+        {
+            Console.WriteLine("Proxy: Logging the time of request.");
+        }
     }
-}
-
-// The Product interface declares the operations that all concrete products
-// must implement.
-public interface IProduct
-{
-    string Operation();
-}
-
-// Concrete Products provide various implementations of the Product
-// interface.
-class ConcreteProduct1 : IProduct
-{
-    public string Operation()
+    
+    public class Client
     {
-        return "{Result of ConcreteProduct1}";
+        // The client code is supposed to work with all objects (both subjects
+        // and proxies) via the Subject interface in order to support both real
+        // subjects and proxies. In real life, however, clients mostly work with
+        // their real subjects directly. In this case, to implement the pattern
+        // more easily, you can extend your proxy from the real subject's class.
+        public void ClientCode(ISubject subject)
+        {
+            // ...
+            
+            subject.Request();
+            
+            // ...
+        }
     }
-}
-
-class ConcreteProduct2 : IProduct
-{
-    public string Operation()
+    
+    class Program
     {
-        return "{Result of ConcreteProduct2}";
-    }
-}
+        static void Main(string[] args)
+        {
+            Client client = new Client();
+            
+            Console.WriteLine("Client: Executing the client code with a real subject:");
+            RealSubject realSubject = new RealSubject();
+            client.ClientCode(realSubject);
 
-class Client
-{
-    public void Main()
-    {
-        Console.WriteLine("App: Launched with the ConcreteCreator1.");
-        ClientCode(new ConcreteCreator1());
+            Console.WriteLine();
 
-        Console.WriteLine("");
-
-        Console.WriteLine("App: Launched with the ConcreteCreator2.");
-        ClientCode(new ConcreteCreator2());
-    }
-
-    // The client code works with an instance of a concrete creator, albeit
-    // through its base interface. As long as the client keeps working with
-    // the creator via the base interface, you can pass it any creator's
-    // subclass.
-    public void ClientCode(Creator creator)
-    {
-        // ...
-        Console.WriteLine("Client: I'm not aware of the creator's class," +
-                          "but it still works.\n" + creator.SomeOperation());
-        // ...
-    }
-}
-
-class Program
-{
-    static void Main(string[] args)
-    {
-        new Client().Main();
+            Console.WriteLine("Client: Executing the same client code with a proxy:");
+            Proxy proxy = new Proxy(realSubject);
+            client.ClientCode(proxy);
+        }
     }
 }
