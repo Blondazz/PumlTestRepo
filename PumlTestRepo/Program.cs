@@ -1,111 +1,117 @@
-﻿namespace PumlTestRepo;
+﻿using System;
 
-using System;
-
-// The Creator class declares the factory method that is supposed to return
-// an object of a Product class. The Creator's subclasses usually provide
-// the implementation of this method.
-abstract class Creator
+namespace RefactoringGuru.DesignPatterns.Mediator.Conceptual
 {
-    // Note that the Creator may also provide some default implementation of
-    // the factory method.
-    public abstract IProduct FactoryMethod();
-
-    // Also note that, despite its name, the Creator's primary
-    // responsibility is not creating products. Usually, it contains some
-    // core business logic that relies on Product objects, returned by the
-    // factory method. Subclasses can indirectly change that business logic
-    // by overriding the factory method and returning a different type of
-    // product from it.
-    public string SomeOperation()
+    // The Mediator interface declares a method used by components to notify the
+    // mediator about various events. The Mediator may react to these events and
+    // pass the execution to other components.
+    public interface IMediator
     {
-        // Call the factory method to create a Product object.
-        var product = FactoryMethod();
-        // Now, use the product.
-        var result = "Creator: The same creator's code has just worked with "
-                     + product.Operation();
-
-        return result;
+        void Notify(object sender, string ev);
     }
-}
 
-// Concrete Creators override the factory method in order to change the
-// resulting product's type.
-class ConcreteCreator1 : Creator
-{
-    // Note that the signature of the method still uses the abstract product
-    // type, even though the concrete product is actually returned from the
-    // method. This way the Creator can stay independent of concrete product
+    // Concrete Mediators implement cooperative behavior by coordinating several
+    // components.
+    class ConcreteMediator : IMediator
+    {
+        private Component1 _component1;
+
+        private Component2 _component2;
+
+        public ConcreteMediator(Component1 component1, Component2 component2)
+        {
+            this._component1 = component1;
+            this._component1.SetMediator(this);
+            this._component2 = component2;
+            this._component2.SetMediator(this);
+        } 
+
+        public void Notify(object sender, string ev)
+        {
+            if (ev == "A")
+            {
+                Console.WriteLine("Mediator reacts on A and triggers folowing operations:");
+                this._component2.DoC();
+            }
+            if (ev == "D")
+            {
+                Console.WriteLine("Mediator reacts on D and triggers following operations:");
+                this._component1.DoB();
+                this._component2.DoC();
+            }
+        }
+    }
+
+    // The Base Component provides the basic functionality of storing a
+    // mediator's instance inside component objects.
+    class BaseComponent
+    {
+        protected IMediator _mediator;
+
+        public BaseComponent(IMediator mediator = null)
+        {
+            this._mediator = mediator;
+        }
+
+        public void SetMediator(IMediator mediator)
+        {
+            this._mediator = mediator;
+        }
+    }
+
+    // Concrete Components implement various functionality. They don't depend on
+    // other components. They also don't depend on any concrete mediator
     // classes.
-    public override IProduct FactoryMethod()
+    class Component1 : BaseComponent
     {
-        return new ConcreteProduct1();
-    }
-}
+        public void DoA()
+        {
+            Console.WriteLine("Component 1 does A.");
 
-class ConcreteCreator2 : Creator
-{
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct2();
-    }
-}
+            this._mediator.Notify(this, "A");
+        }
 
-// The Product interface declares the operations that all concrete products
-// must implement.
-public interface IProduct
-{
-    string Operation();
-}
+        public void DoB()
+        {
+            Console.WriteLine("Component 1 does B.");
 
-// Concrete Products provide various implementations of the Product
-// interface.
-class ConcreteProduct1 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct1}";
-    }
-}
-
-class ConcreteProduct2 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct2}";
-    }
-}
-
-class Client
-{
-    public void Main()
-    {
-        Console.WriteLine("App: Launched with the ConcreteCreator1.");
-        ClientCode(new ConcreteCreator1());
-
-        Console.WriteLine("");
-
-        Console.WriteLine("App: Launched with the ConcreteCreator2.");
-        ClientCode(new ConcreteCreator2());
+            this._mediator.Notify(this, "B");
+        }
     }
 
-    // The client code works with an instance of a concrete creator, albeit
-    // through its base interface. As long as the client keeps working with
-    // the creator via the base interface, you can pass it any creator's
-    // subclass.
-    public void ClientCode(Creator creator)
+    class Component2 : BaseComponent
     {
-        // ...
-        Console.WriteLine("Client: I'm not aware of the creator's class," +
-                          "but it still works.\n" + creator.SomeOperation());
-        // ...
-    }
-}
+        public void DoC()
+        {
+            Console.WriteLine("Component 2 does C.");
 
-class Program
-{
-    static void Main(string[] args)
+            this._mediator.Notify(this, "C");
+        }
+
+        public void DoD()
+        {
+            Console.WriteLine("Component 2 does D.");
+
+            this._mediator.Notify(this, "D");
+        }
+    }
+    
+    class Program
     {
-        new Client().Main();
+        static void Main(string[] args)
+        {
+            // The client code.
+            Component1 component1 = new Component1();
+            Component2 component2 = new Component2();
+            new ConcreteMediator(component1, component2);
+
+            Console.WriteLine("Client triggets operation A.");
+            component1.DoA();
+
+            Console.WriteLine();
+
+            Console.WriteLine("Client triggers operation D.");
+            component2.DoD();
+        }
     }
 }

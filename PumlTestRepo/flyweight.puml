@@ -1,0 +1,27 @@
+@startuml
+class Flyweight {
+    + Flyweight(car:Car)
+    + Operation(uniqueState:Car) : void
+}
+class FlyweightFactory {
+    + FlyweightFactory(args:Car[])
+    + getKey(key:Car) : string
+    + GetFlyweight(sharedState:Car) : Flyweight
+    + listFlyweights() : void
+}
+class Car {
+    + Owner : string <<get>> <<set>>
+    + Number : string <<get>> <<set>>
+    + Company : string <<get>> <<set>>
+    + Model : string <<get>> <<set>>
+    + Color : string <<get>> <<set>>
+}
+class Program {
+    {static} Main(args:string[]) : void
+    + {static} addCarToPoliceDatabase(factory:FlyweightFactory, car:Car) : void
+}
+class "List`1"<T> {
+}
+Flyweight --> "_sharedState" Car
+FlyweightFactory o-> "flyweights<Tuple<Flyweight, string>>" "List`1"
+@enduml
