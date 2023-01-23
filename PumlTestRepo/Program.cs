@@ -1,111 +1,157 @@
-﻿namespace PumlTestRepo;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+// Use Json.NET library, you can download it from NuGet Package Manager
+using Newtonsoft.Json;
 
-using System;
-
-// The Creator class declares the factory method that is supposed to return
-// an object of a Product class. The Creator's subclasses usually provide
-// the implementation of this method.
-abstract class Creator
+namespace RefactoringGuru.DesignPatterns.Flyweight.Conceptual
 {
-    // Note that the Creator may also provide some default implementation of
-    // the factory method.
-    public abstract IProduct FactoryMethod();
-
-    // Also note that, despite its name, the Creator's primary
-    // responsibility is not creating products. Usually, it contains some
-    // core business logic that relies on Product objects, returned by the
-    // factory method. Subclasses can indirectly change that business logic
-    // by overriding the factory method and returning a different type of
-    // product from it.
-    public string SomeOperation()
+    // The Flyweight stores a common portion of the state (also called intrinsic
+    // state) that belongs to multiple real business entities. The Flyweight
+    // accepts the rest of the state (extrinsic state, unique for each entity)
+    // via its method parameters.
+    public class Flyweight
     {
-        // Call the factory method to create a Product object.
-        var product = FactoryMethod();
-        // Now, use the product.
-        var result = "Creator: The same creator's code has just worked with "
-                     + product.Operation();
+        private Car _sharedState;
 
-        return result;
-    }
-}
+        public Flyweight(Car car)
+        {
+            this._sharedState = car;
+        }
 
-// Concrete Creators override the factory method in order to change the
-// resulting product's type.
-class ConcreteCreator1 : Creator
-{
-    // Note that the signature of the method still uses the abstract product
-    // type, even though the concrete product is actually returned from the
-    // method. This way the Creator can stay independent of concrete product
-    // classes.
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct1();
-    }
-}
-
-class ConcreteCreator2 : Creator
-{
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct2();
-    }
-}
-
-// The Product interface declares the operations that all concrete products
-// must implement.
-public interface IProduct
-{
-    string Operation();
-}
-
-// Concrete Products provide various implementations of the Product
-// interface.
-class ConcreteProduct1 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct1}";
-    }
-}
-
-class ConcreteProduct2 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct2}";
-    }
-}
-
-class Client
-{
-    public void Main()
-    {
-        Console.WriteLine("App: Launched with the ConcreteCreator1.");
-        ClientCode(new ConcreteCreator1());
-
-        Console.WriteLine("");
-
-        Console.WriteLine("App: Launched with the ConcreteCreator2.");
-        ClientCode(new ConcreteCreator2());
+        public void Operation(Car uniqueState)
+        {
+            string s = JsonConvert.SerializeObject(this._sharedState);
+            string u = JsonConvert.SerializeObject(uniqueState);
+            Console.WriteLine($"Flyweight: Displaying shared {s} and unique {u} state.");
+        }
     }
 
-    // The client code works with an instance of a concrete creator, albeit
-    // through its base interface. As long as the client keeps working with
-    // the creator via the base interface, you can pass it any creator's
-    // subclass.
-    public void ClientCode(Creator creator)
+    // The Flyweight Factory creates and manages the Flyweight objects. It
+    // ensures that flyweights are shared correctly. When the client requests a
+    // flyweight, the factory either returns an existing instance or creates a
+    // new one, if it doesn't exist yet.
+    public class FlyweightFactory
     {
-        // ...
-        Console.WriteLine("Client: I'm not aware of the creator's class," +
-                          "but it still works.\n" + creator.SomeOperation());
-        // ...
-    }
-}
+        private List<Tuple<Flyweight, string>> flyweights = new List<Tuple<Flyweight, string>>();
 
-class Program
-{
-    static void Main(string[] args)
+        public FlyweightFactory(params Car[] args)
+        {
+            foreach (var elem in args)
+            {
+                flyweights.Add(new Tuple<Flyweight, string>(new Flyweight(elem), this.getKey(elem)));
+            }
+        }
+
+        // Returns a Flyweight's string hash for a given state.
+        public string getKey(Car key)
+        {
+            List<string> elements = new List<string>();
+
+            elements.Add(key.Model);
+            elements.Add(key.Color);
+            elements.Add(key.Company);
+
+            if (key.Owner != null && key.Number != null)
+            {
+                elements.Add(key.Number);
+                elements.Add(key.Owner);
+            }
+
+            elements.Sort();
+
+            return string.Join("_", elements);
+        }
+
+        // Returns an existing Flyweight with a given state or creates a new
+        // one.
+        public Flyweight GetFlyweight(Car sharedState)
+        {
+            string key = this.getKey(sharedState);
+
+            if (flyweights.Where(t => t.Item2 == key).Count() == 0)
+            {
+                Console.WriteLine("FlyweightFactory: Can't find a flyweight, creating new one.");
+                this.flyweights.Add(new Tuple<Flyweight, string>(new Flyweight(sharedState), key));
+            }
+            else
+            {
+                Console.WriteLine("FlyweightFactory: Reusing existing flyweight.");
+            }
+            return this.flyweights.Where(t => t.Item2 == key).FirstOrDefault().Item1;
+        }
+
+        public void listFlyweights()
+        {
+            var count = flyweights.Count;
+            Console.WriteLine($"\nFlyweightFactory: I have {count} flyweights:");
+            foreach (var flyweight in flyweights)
+            {
+                Console.WriteLine(flyweight.Item2);
+            }
+        }
+    }
+
+    public class Car
     {
-        new Client().Main();
+        public string Owner { get; set; }
+
+        public string Number { get; set; }
+
+        public string Company { get; set; }
+
+        public string Model { get; set; }
+
+        public string Color { get; set; }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // The client code usually creates a bunch of pre-populated
+            // flyweights in the initialization stage of the application.
+            var factory = new FlyweightFactory(
+                new Car { Company = "Chevrolet", Model = "Camaro2018", Color = "pink" },
+                new Car { Company = "Mercedes Benz", Model = "C300", Color = "black" },
+                new Car { Company = "Mercedes Benz", Model = "C500", Color = "red" },
+                new Car { Company = "BMW", Model = "M5", Color = "red" },
+                new Car { Company = "BMW", Model = "X6", Color = "white" }
+            );
+            factory.listFlyweights();
+
+            addCarToPoliceDatabase(factory, new Car {
+                Number = "CL234IR",
+                Owner = "James Doe",
+                Company = "BMW",
+                Model = "M5",
+                Color = "red"
+            });
+
+            addCarToPoliceDatabase(factory, new Car {
+                Number = "CL234IR",
+                Owner = "James Doe",
+                Company = "BMW",
+                Model = "X1",
+                Color = "red"
+            });
+
+            factory.listFlyweights();
+        }
+
+        public static void addCarToPoliceDatabase(FlyweightFactory factory, Car car)
+        {
+            Console.WriteLine("\nClient: Adding a car to database.");
+
+            var flyweight = factory.GetFlyweight(new Car {
+                Color = car.Color,
+                Model = car.Model,
+                Company = car.Company
+            });
+
+            // The client code either stores or calculates extrinsic state and
+            // passes it to the flyweight's methods.
+            flyweight.Operation(car);
+        }
     }
 }
