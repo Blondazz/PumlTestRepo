@@ -1,111 +1,119 @@
-﻿namespace PumlTestRepo;
+﻿using System;
 
-using System;
-
-// The Creator class declares the factory method that is supposed to return
-// an object of a Product class. The Creator's subclasses usually provide
-// the implementation of this method.
-abstract class Creator
+namespace RefactoringGuru.DesignPatterns.TemplateMethod.Conceptual
 {
-    // Note that the Creator may also provide some default implementation of
-    // the factory method.
-    public abstract IProduct FactoryMethod();
-
-    // Also note that, despite its name, the Creator's primary
-    // responsibility is not creating products. Usually, it contains some
-    // core business logic that relies on Product objects, returned by the
-    // factory method. Subclasses can indirectly change that business logic
-    // by overriding the factory method and returning a different type of
-    // product from it.
-    public string SomeOperation()
+    // The Abstract Class defines a template method that contains a skeleton of
+    // some algorithm, composed of calls to (usually) abstract primitive
+    // operations.
+    //
+    // Concrete subclasses should implement these operations, but leave the
+    // template method itself intact.
+    abstract class AbstractClass
     {
-        // Call the factory method to create a Product object.
-        var product = FactoryMethod();
-        // Now, use the product.
-        var result = "Creator: The same creator's code has just worked with "
-                     + product.Operation();
+        // The template method defines the skeleton of an algorithm.
+        public void TemplateMethod()
+        {
+            this.BaseOperation1();
+            this.RequiredOperations1();
+            this.BaseOperation2();
+            this.Hook1();
+            this.RequiredOperation2();
+            this.BaseOperation3();
+            this.Hook2();
+        }
 
-        return result;
-    }
-}
+        // These operations already have implementations.
+        protected void BaseOperation1()
+        {
+            Console.WriteLine("AbstractClass says: I am doing the bulk of the work");
+        }
 
-// Concrete Creators override the factory method in order to change the
-// resulting product's type.
-class ConcreteCreator1 : Creator
-{
-    // Note that the signature of the method still uses the abstract product
-    // type, even though the concrete product is actually returned from the
-    // method. This way the Creator can stay independent of concrete product
-    // classes.
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct1();
-    }
-}
+        protected void BaseOperation2()
+        {
+            Console.WriteLine("AbstractClass says: But I let subclasses override some operations");
+        }
 
-class ConcreteCreator2 : Creator
-{
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct2();
-    }
-}
+        protected void BaseOperation3()
+        {
+            Console.WriteLine("AbstractClass says: But I am doing the bulk of the work anyway");
+        }
+        
+        // These operations have to be implemented in subclasses.
+        protected abstract void RequiredOperations1();
 
-// The Product interface declares the operations that all concrete products
-// must implement.
-public interface IProduct
-{
-    string Operation();
-}
+        protected abstract void RequiredOperation2();
+        
+        // These are "hooks." Subclasses may override them, but it's not
+        // mandatory since the hooks already have default (but empty)
+        // implementation. Hooks provide additional extension points in some
+        // crucial places of the algorithm.
+        protected virtual void Hook1() { }
 
-// Concrete Products provide various implementations of the Product
-// interface.
-class ConcreteProduct1 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct1}";
-    }
-}
-
-class ConcreteProduct2 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct2}";
-    }
-}
-
-class Client
-{
-    public void Main()
-    {
-        Console.WriteLine("App: Launched with the ConcreteCreator1.");
-        ClientCode(new ConcreteCreator1());
-
-        Console.WriteLine("");
-
-        Console.WriteLine("App: Launched with the ConcreteCreator2.");
-        ClientCode(new ConcreteCreator2());
+        protected virtual void Hook2() { }
     }
 
-    // The client code works with an instance of a concrete creator, albeit
-    // through its base interface. As long as the client keeps working with
-    // the creator via the base interface, you can pass it any creator's
-    // subclass.
-    public void ClientCode(Creator creator)
+    // Concrete classes have to implement all abstract operations of the base
+    // class. They can also override some operations with a default
+    // implementation.
+    class ConcreteClass1 : AbstractClass
     {
-        // ...
-        Console.WriteLine("Client: I'm not aware of the creator's class," +
-                          "but it still works.\n" + creator.SomeOperation());
-        // ...
-    }
-}
+        protected override void RequiredOperations1()
+        {
+            Console.WriteLine("ConcreteClass1 says: Implemented Operation1");
+        }
 
-class Program
-{
-    static void Main(string[] args)
+        protected override void RequiredOperation2()
+        {
+            Console.WriteLine("ConcreteClass1 says: Implemented Operation2");
+        }
+    }
+
+    // Usually, concrete classes override only a fraction of base class'
+    // operations.
+    class ConcreteClass2 : AbstractClass
     {
-        new Client().Main();
+        protected override void RequiredOperations1()
+        {
+            Console.WriteLine("ConcreteClass2 says: Implemented Operation1");
+        }
+
+        protected override void RequiredOperation2()
+        {
+            Console.WriteLine("ConcreteClass2 says: Implemented Operation2");
+        }
+
+        protected override void Hook1()
+        {
+            Console.WriteLine("ConcreteClass2 says: Overridden Hook1");
+        }
+    }
+
+    class Client
+    {
+        // The client code calls the template method to execute the algorithm.
+        // Client code does not have to know the concrete class of an object it
+        // works with, as long as it works with objects through the interface of
+        // their base class.
+        public static void ClientCode(AbstractClass abstractClass)
+        {
+            // ...
+            abstractClass.TemplateMethod();
+            // ...
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Same client code can work with different subclasses:");
+
+            Client.ClientCode(new ConcreteClass1());
+
+            Console.Write("\n");
+            
+            Console.WriteLine("Same client code can work with different subclasses:");
+            Client.ClientCode(new ConcreteClass2());
+        }
     }
 }
