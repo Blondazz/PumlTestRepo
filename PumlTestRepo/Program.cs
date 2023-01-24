@@ -1,111 +1,121 @@
-﻿namespace PumlTestRepo;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 
-using System;
-
-// The Creator class declares the factory method that is supposed to return
-// an object of a Product class. The Creator's subclasses usually provide
-// the implementation of this method.
-abstract class Creator
+namespace RefactoringGuru.DesignPatterns.Observer.Conceptual
 {
-    // Note that the Creator may also provide some default implementation of
-    // the factory method.
-    public abstract IProduct FactoryMethod();
-
-    // Also note that, despite its name, the Creator's primary
-    // responsibility is not creating products. Usually, it contains some
-    // core business logic that relies on Product objects, returned by the
-    // factory method. Subclasses can indirectly change that business logic
-    // by overriding the factory method and returning a different type of
-    // product from it.
-    public string SomeOperation()
+    public interface IObserver
     {
-        // Call the factory method to create a Product object.
-        var product = FactoryMethod();
-        // Now, use the product.
-        var result = "Creator: The same creator's code has just worked with "
-                     + product.Operation();
-
-        return result;
-    }
-}
-
-// Concrete Creators override the factory method in order to change the
-// resulting product's type.
-class ConcreteCreator1 : Creator
-{
-    // Note that the signature of the method still uses the abstract product
-    // type, even though the concrete product is actually returned from the
-    // method. This way the Creator can stay independent of concrete product
-    // classes.
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct1();
-    }
-}
-
-class ConcreteCreator2 : Creator
-{
-    public override IProduct FactoryMethod()
-    {
-        return new ConcreteProduct2();
-    }
-}
-
-// The Product interface declares the operations that all concrete products
-// must implement.
-public interface IProduct
-{
-    string Operation();
-}
-
-// Concrete Products provide various implementations of the Product
-// interface.
-class ConcreteProduct1 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct1}";
-    }
-}
-
-class ConcreteProduct2 : IProduct
-{
-    public string Operation()
-    {
-        return "{Result of ConcreteProduct2}";
-    }
-}
-
-class Client
-{
-    public void Main()
-    {
-        Console.WriteLine("App: Launched with the ConcreteCreator1.");
-        ClientCode(new ConcreteCreator1());
-
-        Console.WriteLine("");
-
-        Console.WriteLine("App: Launched with the ConcreteCreator2.");
-        ClientCode(new ConcreteCreator2());
+        // Receive update from subject
+        void Update(ISubject subject);
     }
 
-    // The client code works with an instance of a concrete creator, albeit
-    // through its base interface. As long as the client keeps working with
-    // the creator via the base interface, you can pass it any creator's
-    // subclass.
-    public void ClientCode(Creator creator)
+    public interface ISubject
     {
-        // ...
-        Console.WriteLine("Client: I'm not aware of the creator's class," +
-                          "but it still works.\n" + creator.SomeOperation());
-        // ...
-    }
-}
+        // Attach an observer to the subject.
+        void Attach(IObserver observer);
 
-class Program
-{
-    static void Main(string[] args)
+        // Detach an observer from the subject.
+        void Detach(IObserver observer);
+
+        // Notify all observers about an event.
+        void Notify();
+    }
+
+    // The Subject owns some important state and notifies observers when the
+    // state changes.
+    public class Subject : ISubject
     {
-        new Client().Main();
+        // For the sake of simplicity, the Subject's state, essential to all
+        // subscribers, is stored in this variable.
+        public int State { get; set; } = -0;
+
+        // List of subscribers. In real life, the list of subscribers can be
+        // stored more comprehensively (categorized by event type, etc.).
+        private List<IObserver> _observers = new List<IObserver>();
+
+        // The subscription management methods.
+        public void Attach(IObserver observer)
+        {
+            Console.WriteLine("Subject: Attached an observer.");
+            this._observers.Add(observer);
+        }
+
+        public void Detach(IObserver observer)
+        {
+            this._observers.Remove(observer);
+            Console.WriteLine("Subject: Detached an observer.");
+        }
+
+        // Trigger an update in each subscriber.
+        public void Notify()
+        {
+            Console.WriteLine("Subject: Notifying observers...");
+
+            foreach (var observer in _observers)
+            {
+                observer.Update(this);
+            }
+        }
+
+        // Usually, the subscription logic is only a fraction of what a Subject
+        // can really do. Subjects commonly hold some important business logic,
+        // that triggers a notification method whenever something important is
+        // about to happen (or after it).
+        public void SomeBusinessLogic()
+        {
+            Console.WriteLine("\nSubject: I'm doing something important.");
+            this.State = new Random().Next(0, 10);
+
+            Thread.Sleep(15);
+
+            Console.WriteLine("Subject: My state has just changed to: " + this.State);
+            this.Notify();
+        }
+    }
+
+    // Concrete Observers react to the updates issued by the Subject they had
+    // been attached to.
+    class ConcreteObserverA : IObserver
+    {
+        public void Update(ISubject subject)
+        {            
+            if ((subject as Subject).State < 3)
+            {
+                Console.WriteLine("ConcreteObserverA: Reacted to the event.");
+            }
+        }
+    }
+
+    class ConcreteObserverB : IObserver
+    {
+        public void Update(ISubject subject)
+        {
+            if ((subject as Subject).State == 0 || (subject as Subject).State >= 2)
+            {
+                Console.WriteLine("ConcreteObserverB: Reacted to the event.");
+            }
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // The client code.
+            var subject = new Subject();
+            var observerA = new ConcreteObserverA();
+            subject.Attach(observerA);
+
+            var observerB = new ConcreteObserverB();
+            subject.Attach(observerB);
+
+            subject.SomeBusinessLogic();
+            subject.SomeBusinessLogic();
+
+            subject.Detach(observerB);
+
+            subject.SomeBusinessLogic();
+        }
     }
 }
