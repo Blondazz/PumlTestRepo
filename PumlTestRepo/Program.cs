@@ -111,9 +111,9 @@ namespace RefactoringGuru.DesignPatterns.AbstractFactory.Conceptual
             return "The result of the product B2.";
         }
 
-       // The variant, Product B2, is only able to work correctly with the
-       // variant, Product A2. Nevertheless, it accepts any instance of
-       // AbstractProductA as an argument.
+        // The variant, Product B2, is only able to work correctly with the
+        // variant, Product A2. Nevertheless, it accepts any instance of
+        // AbstractProductA as an argument.
         public string AnotherUsefulFunctionB(IAbstractProductA collaborator)
         {
             var result = collaborator.UsefulFunctionA();
@@ -155,8 +155,17 @@ namespace RefactoringGuru.DesignPatterns.AbstractFactory.Conceptual
             new Client().Main();
         }
     }
-    
-    
-    interface OtherInterface1{}
-    class OtherConcreteFactory1{}
+
+
+    interface OtherInterface1
+    {
+    }
+
+    class OtherConcreteFactory1
+    {
+        public IAbstractProductB CreateProductB()
+        {
+            return new ConcreteProductB1();
+        }
+    }
 }
