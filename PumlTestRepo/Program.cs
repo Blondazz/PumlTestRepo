@@ -155,4 +155,8 @@ namespace RefactoringGuru.DesignPatterns.AbstractFactory.Conceptual
             new Client().Main();
         }
     }
+    
+    
+    interface OtherInterface1{}
+    class OtherClass1{}
 }
