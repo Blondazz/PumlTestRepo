@@ -158,5 +158,5 @@ namespace RefactoringGuru.DesignPatterns.AbstractFactory.Conceptual
     
     
     interface OtherInterface1{}
-    class OtherClass1{}
+    class OtherConcreteFactory1{}
 }
