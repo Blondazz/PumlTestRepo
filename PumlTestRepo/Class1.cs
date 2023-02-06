@@ -100,6 +100,7 @@ public class C1
     
     
     
+    
     public event EventHandler Somet;
     private static event EventHandler XD;
     internal event EventHandler<string> lol;
